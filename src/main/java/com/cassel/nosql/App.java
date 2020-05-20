@@ -17,15 +17,15 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.MongoClient;
 
-public class App {
-	
-	
-	
-    public String getGreeting() {
+public class App
+{
+    public String getGreeting()
+    {
         return "Hello world.";
     }
     
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
         System.out.println(new App().getGreeting());
         
         String database = "";

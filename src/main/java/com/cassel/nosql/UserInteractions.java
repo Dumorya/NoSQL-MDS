@@ -1,23 +1,29 @@
 package com.cassel.nosql;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.bson.Document;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 
-public class UserInteractions {
+public class UserInteractions
+{
 	
 	private MongoDatabase db;
 
-	public UserInteractions(MongoClient client, String database) {
+	public UserInteractions(MongoClient client, String database)
+	{
 		this.db = client.getDatabase(database);
 	}
 
-	public void connection() {
+	public void connection() 
+	{
         
         // get collections name 
         MongoIterable <String> collections = db.listCollectionNames();
@@ -69,15 +75,15 @@ public class UserInteractions {
         	if(choice.equals("re"))
             {
                 System.out.println("Vous avez choisi de rechercher un document");
-                searchDocument();
+                searchDocument(collection);
                 chosen = true;
             }
-            else if(chosenCollection.equals("in"))
+            else if(choice.equals("in"))
             {
             	System.out.println("Vous avez choisi d'insérer un document");
             	chosen = true;
             }
-            else if(chosenCollection.equals("fin"))
+            else if(choice.equals("fin"))
             {
             	System.out.println("FIN");
             	chosen = true;
@@ -92,7 +98,26 @@ public class UserInteractions {
     }
 	
 	
-	public void searchDocument() {
+	public void searchDocument(MongoCollection<Document> collection)
+	{
+		FindIterable<Document> documents = collection.find();
+		ArrayList<String> availableKeys = new ArrayList<>();;
+		
+		for(Document doc : documents)
+		{
+			for(String key : doc.keySet())
+			{
+				if(availableKeys.contains(key))
+				{
+					availableKeys.add(key);
+					System.out.println(key);
+				}
+			}
+		}
+    }
+	
+	public void insertDocument()
+	{
     	
     }
 }

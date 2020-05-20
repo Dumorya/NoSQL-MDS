@@ -7,8 +7,8 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
-public class MongoClientConnection {
-	
+public class MongoClientConnection
+{
 	public static MongoClient getMongoClient(final String host, final int port)
     {
     	MongoClient mongoClient = MongoClients.create(
