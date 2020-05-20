@@ -19,13 +19,17 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println(new App().getGreeting());
         
+        String database = "";
+        String host = "";
+        int port = 0;
+        
         for(int i = 0 ; i < args.length ; i++)
         {
         	if (args[i].equals("--db"))
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                	String database = args[i+1];
+                	database = args[i+1];
                 }
                 else
                 {
@@ -37,7 +41,7 @@ public class App {
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                	final String host = args[i+1];
+                	host = args[i+1];
                 }
                 else
                 {
@@ -50,7 +54,7 @@ public class App {
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
                 	String portString = args[i+1];
-                	final int port = Integer.parseInt(portString);
+                	port = Integer.parseInt(portString);
                 }
                 else
                 {
@@ -68,12 +72,14 @@ public class App {
         System.out.println(myDoc.toJson());*/
     }
     
-    public void getMongoClient(final String host, final int port)
+    public static MongoClient getMongoClient(final String host, final int port)
     {
     	MongoClient mongoClient = MongoClients.create(
                 MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
                                 builder.hosts(Arrays.asList(new ServerAddress(host, port))))
                         .build());
+    	
+    	return mongoClient;
     }
 }
