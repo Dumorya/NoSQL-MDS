@@ -3,7 +3,11 @@
  */
 package com.cassel.nosql;
 
+import java.util.Arrays;
+
 import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
 
@@ -15,22 +19,56 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println(new App().getGreeting());
         
+        String database = "";
+        String host = "";
+        String portString = "";
+        int port = 0;
+        
         for(int i = 0 ; i < args.length ; i++)
         {
         	if (args[i].equals("--db"))
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                  String database = args[i+1];
+                	database = args[i+1];
                 }
                 else
                 {
-                  throw new Exception("--db not defined");
+                	throw new Exception("--db not defined");
+                }
+            }
+        	
+        	if (args[i].equals("--host"))
+        	{
+                if (i + 1 < args.length && !args[i + 1].startsWith("--"))
+                {
+                	host = args[i+1];
+                }
+                else
+                {
+                	throw new Exception("--host not defined");
+                }
+            }
+        	
+        	if (args[i].equals("--port"))
+        	{
+                if (i + 1 < args.length && !args[i + 1].startsWith("--"))
+                {
+                	portString = args[i+1];
+                	port = Integer.parseInt(portString);
+                }
+                else
+                {
+                	throw new Exception("--port not defined");
                 }
             }
         }
         
-        MongoClient mongoClient = MongoClients.create();
+        MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(Arrays.asList(new ServerAddress(host, port))))
+                        .build());
         
         /*MongoDatabase database = mongoClient.getDatabase("mydb");
         MongoCollection<Document> collection = database.getCollection("test");
