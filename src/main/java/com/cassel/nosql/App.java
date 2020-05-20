@@ -19,18 +19,13 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println(new App().getGreeting());
         
-        String database = "";
-        String host = "";
-        String portString = "";
-        int port = 0;
-        
         for(int i = 0 ; i < args.length ; i++)
         {
         	if (args[i].equals("--db"))
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                	database = args[i+1];
+                	String database = args[i+1];
                 }
                 else
                 {
@@ -42,7 +37,7 @@ public class App {
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                	host = args[i+1];
+                	final String host = args[i+1];
                 }
                 else
                 {
@@ -54,8 +49,8 @@ public class App {
         	{
                 if (i + 1 < args.length && !args[i + 1].startsWith("--"))
                 {
-                	portString = args[i+1];
-                	port = Integer.parseInt(portString);
+                	String portString = args[i+1];
+                	final int port = Integer.parseInt(portString);
                 }
                 else
                 {
@@ -64,16 +59,21 @@ public class App {
             }
         }
         
-        MongoClient mongoClient = MongoClients.create(
-                MongoClientSettings.builder()
-                        .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress(host, port))))
-                        .build());
+        getMongoClient(host, port);
         
         /*MongoDatabase database = mongoClient.getDatabase("mydb");
         MongoCollection<Document> collection = database.getCollection("test");
 
         Document myDoc = collection.find();
         System.out.println(myDoc.toJson());*/
+    }
+    
+    public void getMongoClient(final String host, final int port)
+    {
+    	MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(Arrays.asList(new ServerAddress(host, port))))
+                        .build());
     }
 }
