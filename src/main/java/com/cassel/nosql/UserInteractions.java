@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 import org.bson.Document;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -102,17 +104,123 @@ public class UserInteractions
 	{
 		FindIterable<Document> documents = collection.find();
 		ArrayList<String> availableKeys = new ArrayList<>();;
+		System.out.println("Veuillez taper le nom d'un des champs qui s'affichent ci-dessous :");
 		
 		for(Document doc : documents)
 		{
 			for(String key : doc.keySet())
 			{
-				if(availableKeys.contains(key))
+				if(!availableKeys.contains(key))
 				{
 					availableKeys.add(key);
 					System.out.println(key);
 				}
 			}
+		}
+		
+		Scanner sc = Singleton.getInstance().getScanner();
+		
+		boolean chosen = false;
+		String chosenField = "";
+
+		// choose the field
+        while(!chosen)
+        {
+			chosenField = sc.nextLine();
+
+			if(availableKeys.contains(chosenField))
+			{
+				System.out.printf("Vous avez choisi %s.", chosenField);
+				chosen = true;
+			}
+			else
+			{
+				System.out.println("Le champ choisi n'existe pas. Veuillez réessayer.");
+				chosen = false;
+			}
+        }
+        
+        //TODO: get datatype, in order to check automatically if the operator is correct
+        
+        // choose the operator
+        
+        chosen = false;
+		String chosenOperator = "";
+		
+		String operators [] = {"inf", "inf egal", "sup", "sup egal", "egal", "true", "false"};
+		
+		System.out.println("Veuillez choisir un opérateur parmis ceux ci-dessous :");
+		
+		for(int i = 0 ; i < operators.length ; i++)
+		{
+			System.out.printf("%s \n", operators[i]);
+		}
+		
+    	chosenOperator = sc.nextLine();
+    	
+    	String operator = "";
+    	
+		//TODO: check operator exists
+    	
+    	if(chosenOperator.equals("inf"))
+    	{
+    		operator = "$lt";
+    	}
+    	
+    	if(chosenOperator.equals("inf egal"))
+    	{
+    		operator = "$lte";
+    	}
+    	
+    	if(chosenOperator.equals("sup"))
+    	{
+    		operator = "$gt";
+    	}
+    	
+    	if(chosenOperator.equals("sup egal"))
+    	{
+    		operator = "$gte";
+    	}
+    	
+    	
+    	// get data to compare
+    	System.out.println("Quelle est la valeur avec laquelle vous souhaitez comparer ?");
+    	
+    	String dataToCompare = "";
+
+    	dataToCompare = sc.nextLine();
+    	
+    	BasicDBObject query = null;
+    	    	
+    	if(!operator.equals("egal") || !operator.equals("true") || !operator.equals("false"))
+    	{
+    		query = new BasicDBObject(chosenField,
+                    new BasicDBObject(operator, dataToCompare));
+    	}
+    	else
+    	{
+    		if(operator.equals("egal"))
+    		{
+    			
+    		}
+    		else if(operator.equals("true"))
+    		{
+    			
+    		}
+    		else if(operator.equals("false"))
+    		{
+    			
+    		}
+    	}
+    	
+    	FindIterable<Document> results = collection.find(query);
+    	
+    	System.out.println("Recherche en cours...");
+    	
+    	for(Document result : results)
+		{
+			System.out.println(result);
+			//affiche rien
 		}
     }
 	
