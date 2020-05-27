@@ -1,8 +1,15 @@
 package com.cassel.nosql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
+import org.bson.BsonBoolean;
+import org.bson.BsonDocument;
+import org.bson.BsonInt32;
+import org.bson.BsonString;
 import org.bson.Document;
 
 import com.mongodb.BasicDBObject;
@@ -103,7 +110,9 @@ public class UserInteractions
 	public void searchDocument(MongoCollection<Document> collection)
 	{
 		FindIterable<Document> documents = collection.find();
-		ArrayList<String> availableKeys = new ArrayList<>();;
+		ArrayList<String> availableKeys = new ArrayList<>();
+		Map<String, String> fieldsType = new HashMap<>();
+		
 		System.out.println("Veuillez taper le nom d'un des champs qui s'affichent ci-dessous :");
 		
 		for(Document doc : documents)
@@ -113,6 +122,17 @@ public class UserInteractions
 				if(!availableKeys.contains(key))
 				{
 					availableKeys.add(key);
+					
+					String typeString = doc.get(key) == null ? "null" : doc.get(key).getClass().getName();
+			        if (!typeString.equals(ArrayList.class.getName()))
+			        {
+			          fieldsType.put(key, typeString);
+			        }
+			        else
+			        {
+			          // System.out.println("Array");
+			        }
+			        
 					System.out.println(key);
 				}
 			}
@@ -147,7 +167,7 @@ public class UserInteractions
         chosen = false;
 		String chosenOperator = "";
 		
-		String operators [] = {"inf", "inf egal", "sup", "sup egal", "egal", "true", "false"};
+		String operators [] = {"inf", "inf egal", "sup", "sup egal", "string egal", "bool egal", "bool non egal"};
 		
 		System.out.println("Veuillez choisir un opérateur parmis ceux ci-dessous :");
 		
@@ -182,6 +202,21 @@ public class UserInteractions
     		operator = "$gte";
     	}
     	
+    	if(chosenOperator.equals("egal"))
+    	{
+    		operator = "$eq";
+    	}
+    	
+    	if(chosenOperator.equals("bool egal"))
+    	{
+    		operator = "=";
+    	}
+    	
+    	if(chosenOperator.equals("bool non egal"))
+    	{
+    		operator = "!=";
+    	}
+    	
     	
     	// get data to compare
     	System.out.println("Quelle est la valeur avec laquelle vous souhaitez comparer ?");
@@ -190,27 +225,32 @@ public class UserInteractions
 
     	dataToCompare = sc.nextLine();
     	
-    	BasicDBObject query = null;
+    	Class<?> cls = null;
+        try
+        {
+        	cls = Class.forName(fieldsType.get(chosenField));
+        }
+        catch (ClassNotFoundException e)
+        {
+        	e.printStackTrace();
+        	cls = String.class;
+        }
+        
+    	BsonDocument query = null;
     	    	
-    	if(!operator.equals("egal") || !operator.equals("true") || !operator.equals("false"))
+    	if(cls == String.class)
     	{
-    		query = new BasicDBObject(chosenField,
-                    new BasicDBObject(operator, dataToCompare));
+    		query = new BsonDocument(chosenField, new BsonDocument(operator, new BsonString(dataToCompare)));
     	}
-    	else
+    	else if(cls == Integer.class)
     	{
-    		if(operator.equals("egal"))
-    		{
-    			
-    		}
-    		else if(operator.equals("true"))
-    		{
-    			
-    		}
-    		else if(operator.equals("false"))
-    		{
-    			
-    		}
+    		int dataInt = Integer.parseInt(dataToCompare);
+    		query = new BsonDocument(chosenField, new BsonDocument(operator, new BsonInt32(dataInt)));
+    	}
+    	else if(cls == Boolean.class)
+    	{
+    		boolean dataBool = Boolean.parseBoolean(dataToCompare);
+    		query = new BsonDocument(chosenField, new BsonDocument(operator, new BsonBoolean(dataBool)));
     	}
     	
     	FindIterable<Document> results = collection.find(query);
@@ -220,7 +260,6 @@ public class UserInteractions
     	for(Document result : results)
 		{
 			System.out.println(result);
-			//affiche rien
 		}
     }
 	
