@@ -188,11 +188,14 @@ public class UserInteractions
 						
 			String valueToInsert = sc.nextLine();
 			
+			// TODO: la condition ne fonctionne pas
 			if(valueToInsert != "null")
 			{
 				obj.put(field, valueToInsert);
 			}
 		}
+		
+		//TODO : gérer les types
 		
 		collection.insertOne(obj);
     }
